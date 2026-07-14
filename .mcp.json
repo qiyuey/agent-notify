@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "gateway": {
+      "command": "/usr/bin/env",
+      "args": ["node", "./dist/mcp/server.js"],
+      "cwd": "",
+      "env_vars": ["PATH", "HOME"]
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "codex-im",
+  "version": "0.1.0",
+  "description": "Local-first durable Telegram delivery for Codex",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@11.17.0",
+  "engines": {
+    "node": ">=26.0.0",
+    "pnpm": ">=11.0.0"
+  },
+  "bin": {
+    "codex-im": "dist/cli.js",
+    "codex-im-daemon": "dist/daemon.js"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "pnpm format:check && pnpm typecheck && pnpm test:coverage && pnpm build && pnpm smoke:dist && pnpm validate:plugin",
+    "format": "biome check --write .",
+    "format:check": "biome check .",
+    "start": "node --env-file-if-exists=.env dist/daemon.js",
+    "smoke:dist": "node scripts/smoke-dist.mjs",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "validate:plugin": "node scripts/validate-plugin.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "grammy": "^1.44.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.3",
+    "@types/node": "26.1.1",
+    "@types/node-fetch": "2.6.13",
+    "@vitest/coverage-v8": "4.1.10",
+    "esbuild": "0.28.1",
+    "typescript": "7.0.2",
+    "vitest": "4.1.10"
+  }
+}

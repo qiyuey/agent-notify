@@ -1,0 +1,21 @@
+{
+  "name": "codex-im",
+  "version": "0.1.0+codex.20260821043948",
+  "description": "Durably deliver explicit Codex results to Telegram.",
+  "author": {
+    "name": "Codex IM contributors"
+  },
+  "license": "MIT",
+  "keywords": ["codex", "telegram", "notifications"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Codex IM",
+    "shortDescription": "Send explicit Codex results to Telegram.",
+    "longDescription": "A local-first durable queue for explicitly requested Telegram notifications.",
+    "developerName": "Codex IM contributors",
+    "category": "Productivity",
+    "capabilities": ["Notifications", "Local-first"],
+    "defaultPrompt": ["Deliver this completed result to Telegram."]
+  }
+}
