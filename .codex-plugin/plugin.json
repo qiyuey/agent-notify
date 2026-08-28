@@ -1,6 +1,6 @@
 {
   "name": "agent-notify",
-  "version": "0.1.0+codex.20260828151147",
+  "version": "0.1.0+codex.20260828152343",
   "description": "Durably deliver explicit agent results to Telegram.",
   "author": {
     "name": "Agent Notify contributors"
