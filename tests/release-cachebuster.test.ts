@@ -11,11 +11,11 @@ const scriptPath = fileURLToPath(
 );
 
 async function makePlugin(version: string) {
-  const root = await mkdtemp(`${tmpdir()}/codex-im-release-`);
+  const root = await mkdtemp(`${tmpdir()}/agent-notify-release-`);
   await mkdir(`${root}/.codex-plugin`);
   await writeFile(
     `${root}/.codex-plugin/plugin.json`,
-    `{\n  "name": "codex-im",\n  "version": ${JSON.stringify(version)},\n  "keywords": ["codex", "telegram"]\n}\n`,
+    `{\n  "name": "agent-notify",\n  "version": ${JSON.stringify(version)},\n  "keywords": ["agent", "telegram"]\n}\n`,
   );
   return root;
 }
@@ -39,7 +39,7 @@ describe("release cachebuster", () => {
     expect(stdout).toBe("0.1.0+codex.old-token -> 0.1.0+codex.20260715010203\n");
     expect(await readVersion(root)).toBe("0.1.0+codex.20260715010203");
     expect(await readFile(`${root}/.codex-plugin/plugin.json`, "utf8")).toContain(
-      '"keywords": ["codex", "telegram"]',
+      '"keywords": ["agent", "telegram"]',
     );
   });
 

@@ -1,18 +1,17 @@
-import { randomUUID } from "node:crypto";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { openNotificationStore } from "../storage/open-store.js";
+import { enqueueNotification } from "../application/enqueue-notification.js";
 
-const server = new McpServer({ name: "codex-im", version: "0.1.0" });
+const server = new McpServer({ name: "agent-notify", version: "0.1.0" });
 
 server.registerTool(
-  "telegram_deliver",
+  "deliver_notification",
   {
     description:
-      "Durably queue one explicit result for asynchronous Telegram delivery. Use only when the user or task contract explicitly requests Telegram delivery.",
+      "Durably queue one explicit result for asynchronous IM delivery. Use only when the user or task contract explicitly requests notification delivery.",
     annotations: {
-      title: "Deliver to Telegram",
+      title: "Deliver notification",
       readOnlyHint: false,
       destructiveHint: false,
       idempotentHint: false,
@@ -30,15 +29,16 @@ server.registerTool(
     }),
   },
   async ({ title, message, dedupeKey }) => {
-    const context = openNotificationStore();
-    try {
-      const idempotencyKey = `explicit:${dedupeKey ?? randomUUID()}`;
-      const duplicate = context.store.findByIdempotencyKey(idempotencyKey) !== null;
-      const notification = context.store.enqueue({ idempotencyKey, title, message });
-      return success({ notificationId: notification.id, state: notification.state, duplicate });
-    } finally {
-      context.database.close();
-    }
+    const result = enqueueNotification("codex", {
+      title,
+      message,
+      ...(dedupeKey ? { dedupeKey } : {}),
+    });
+    return success({
+      notificationId: result.notificationId,
+      state: result.state,
+      duplicate: result.duplicate,
+    });
   },
 );
 

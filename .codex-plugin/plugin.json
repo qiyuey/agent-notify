@@ -1,21 +1,23 @@
 {
-  "name": "codex-im",
-  "version": "0.1.0+codex.20260821043948",
-  "description": "Durably deliver explicit Codex results to Telegram.",
+  "name": "agent-notify",
+  "version": "0.1.0+codex.20260828151147",
+  "description": "Durably deliver explicit agent results to Telegram.",
   "author": {
-    "name": "Codex IM contributors"
+    "name": "Agent Notify contributors"
   },
+  "homepage": "https://github.com/qiyuey/agent-notify",
+  "repository": "https://github.com/qiyuey/agent-notify",
   "license": "MIT",
-  "keywords": ["codex", "telegram", "notifications"],
+  "keywords": ["agent", "codex", "pi", "telegram", "notifications"],
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
-    "displayName": "Codex IM",
-    "shortDescription": "Send explicit Codex results to Telegram.",
-    "longDescription": "A local-first durable queue for explicitly requested Telegram notifications.",
-    "developerName": "Codex IM contributors",
+    "displayName": "Agent Notify",
+    "shortDescription": "Send explicit agent results to Telegram.",
+    "longDescription": "A local-first durable queue for explicitly requested agent notifications.",
+    "developerName": "Agent Notify contributors",
     "category": "Productivity",
     "capabilities": ["Notifications", "Local-first"],
-    "defaultPrompt": ["Deliver this completed result to Telegram."]
+    "defaultPrompt": ["Deliver this completed result as a notification."]
   }
 }

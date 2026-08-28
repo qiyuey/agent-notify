@@ -3,21 +3,21 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
-import { GatewayDatabase } from "../src/storage/database.js";
+import { NotificationDatabase } from "../src/storage/database.js";
 
 describe("delivery-only migration", () => {
   it("creates only the notification queue on a fresh database", () => {
-    const database = new GatewayDatabase(":memory:");
+    const database = new NotificationDatabase(":memory:");
     const tables = tableNames(database);
     expect(tables).toEqual(["outbound_notifications", "schema_migrations"]);
-    expect(database.connection.prepare("SELECT version FROM schema_migrations").get()).toEqual({
-      version: 10,
-    });
+    expect(
+      database.connection.prepare("SELECT version FROM schema_migrations ORDER BY version").all(),
+    ).toEqual([{ version: 10 }, { version: 11 }]);
     database.close();
   });
 
   it("preserves notifications while dropping legacy conversation tables", () => {
-    const directory = mkdtempSync(join(tmpdir(), "codex-im-migration-"));
+    const directory = mkdtempSync(join(tmpdir(), "agent-notify-migration-"));
     const path = join(directory, "gateway.sqlite");
     try {
       const legacy = new DatabaseSync(path);
@@ -43,11 +43,13 @@ describe("delivery-only migration", () => {
         CREATE TABLE context_state (id TEXT);
       `);
       legacy.close();
-      const migrated = new GatewayDatabase(path);
+      const migrated = new NotificationDatabase(path);
       expect(tableNames(migrated)).toEqual(["outbound_notifications", "schema_migrations"]);
       expect(
-        migrated.connection.prepare("SELECT title, message FROM outbound_notifications").get(),
-      ).toEqual({ title: "Title", message: "Body" });
+        migrated.connection
+          .prepare("SELECT producer, title, message FROM outbound_notifications")
+          .get(),
+      ).toEqual({ producer: "codex", title: "Title", message: "Body" });
       migrated.close();
     } finally {
       rmSync(directory, { recursive: true, force: true });
@@ -55,7 +57,7 @@ describe("delivery-only migration", () => {
   });
 });
 
-function tableNames(database: GatewayDatabase): string[] {
+function tableNames(database: NotificationDatabase): string[] {
   return (
     database.connection
       .prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")

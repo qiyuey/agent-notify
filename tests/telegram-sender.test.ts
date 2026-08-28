@@ -4,6 +4,7 @@ import { TelegramNotificationSender } from "../src/telegram/notification-sender.
 
 const notification: OutboundNotification = {
   id: "notification-1",
+  producer: "codex",
   idempotencyKey: "run:1",
   title: "Scheduled report",
   message: "## Result\n\n- Passed",
@@ -12,7 +13,7 @@ const notification: OutboundNotification = {
   nextAttemptAt: 0,
   leaseExpiresAt: null,
   leaseToken: null,
-  telegramMessageId: null,
+  providerMessageId: null,
   lastError: null,
   createdAt: 0,
   updatedAt: 0,

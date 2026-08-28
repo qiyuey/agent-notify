@@ -71,9 +71,9 @@ describe("createLogger", () => {
     expect(parsed()[0]?.attempt).toBe(3);
   });
 
-  it("takes the default level from CODEX_IM_LOG_LEVEL", () => {
-    const previous = process.env.CODEX_IM_LOG_LEVEL;
-    process.env.CODEX_IM_LOG_LEVEL = "error";
+  it("takes the default level from AGENT_NOTIFY_LOG_LEVEL", () => {
+    const previous = process.env.AGENT_NOTIFY_LOG_LEVEL;
+    process.env.AGENT_NOTIFY_LOG_LEVEL = "error";
     const lines: string[] = [];
     try {
       const logger = createLogger({
@@ -84,8 +84,8 @@ describe("createLogger", () => {
       logger.warn("dropped_warn");
       logger.error("kept_error");
     } finally {
-      if (previous === undefined) delete process.env.CODEX_IM_LOG_LEVEL;
-      else process.env.CODEX_IM_LOG_LEVEL = previous;
+      if (previous === undefined) delete process.env.AGENT_NOTIFY_LOG_LEVEL;
+      else process.env.AGENT_NOTIFY_LOG_LEVEL = previous;
     }
 
     expect(lines.map((line) => JSON.parse(line).event)).toEqual(["kept_error"]);

@@ -1,15 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NotificationDispatcher } from "../src/dispatcher/notification-dispatcher.js";
-import { GatewayDatabase } from "../src/storage/database.js";
+import { NotificationDatabase } from "../src/storage/database.js";
 import { OutboundNotificationStore } from "../src/storage/notification-store.js";
 
-let database: GatewayDatabase;
+let database: NotificationDatabase;
 let store: OutboundNotificationStore;
 
 beforeEach(() => {
-  database = new GatewayDatabase(":memory:");
+  database = new NotificationDatabase(":memory:");
   store = new OutboundNotificationStore(database);
-  store.enqueue({ idempotencyKey: "run:1", title: "Report", message: "Done." }, 1_000);
+  store.enqueue(
+    { producer: "codex", idempotencyKey: "codex:run:1", title: "Report", message: "Done." },
+    1_000,
+  );
 });
 
 afterEach(() => database.close());
@@ -20,7 +23,7 @@ describe("NotificationDispatcher", () => {
     const dispatcher = new NotificationDispatcher(store, sender);
     expect(await dispatcher.runOnce(1_100)).toBe(true);
     expect(await dispatcher.runOnce(1_100)).toBe(false);
-    expect(store.list("delivered")[0]?.telegramMessageId).toBe("message-1");
+    expect(store.list("delivered")[0]?.providerMessageId).toBe("message-1");
   });
 
   it("keeps a failed send retryable", async () => {

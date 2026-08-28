@@ -3,7 +3,7 @@ import { dirname } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { migrations } from "./migrations.js";
 
-export class GatewayDatabase {
+export class NotificationDatabase {
   readonly connection: DatabaseSync;
 
   constructor(path: string) {
@@ -59,7 +59,9 @@ export class GatewayDatabase {
       if (!latest) return;
       this.transaction(() => {
         this.connection.exec(latest.freshSql ?? latest.sql);
-        insert.run(latest.version, latest.name, Date.now());
+        for (const migration of migrations) {
+          insert.run(migration.version, migration.name, Date.now());
+        }
       });
       return;
     }

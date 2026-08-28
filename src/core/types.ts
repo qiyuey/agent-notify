@@ -2,6 +2,7 @@ export const notificationStates = ["queued", "leased", "delivered", "dead_letter
 export type NotificationState = (typeof notificationStates)[number];
 
 export interface EnqueueNotificationInput {
+  readonly producer: string;
   readonly idempotencyKey: string;
   readonly title: string;
   readonly message: string;
@@ -14,7 +15,7 @@ export interface OutboundNotification extends EnqueueNotificationInput {
   readonly nextAttemptAt: number;
   readonly leaseExpiresAt: number | null;
   readonly leaseToken: string | null;
-  readonly telegramMessageId: string | null;
+  readonly providerMessageId: string | null;
   readonly lastError: string | null;
   readonly createdAt: number;
   readonly updatedAt: number;

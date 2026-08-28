@@ -1,7 +1,13 @@
 {
-  "name": "codex-im",
+  "name": "agent-notify",
   "version": "0.1.0",
-  "description": "Local-first durable Telegram delivery for Codex",
+  "description": "Local-first durable IM notification delivery for coding agents",
+  "license": "MIT",
+  "homepage": "https://github.com/qiyuey/agent-notify",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qiyuey/agent-notify.git"
+  },
   "type": "module",
   "private": true,
   "packageManager": "pnpm@11.17.0",
@@ -10,8 +16,24 @@
     "pnpm": ">=11.0.0"
   },
   "bin": {
-    "codex-im": "dist/cli.js",
-    "codex-im-daemon": "dist/daemon.js"
+    "agent-notify": "dist/cli.js",
+    "agent-notify-daemon": "dist/daemon.js"
+  },
+  "keywords": [
+    "agent",
+    "codex",
+    "pi",
+    "telegram",
+    "notifications",
+    "pi-package"
+  ],
+  "pi": {
+    "extensions": [
+      "./src/pi/extension.ts"
+    ],
+    "skills": [
+      "./skills"
+    ]
   },
   "scripts": {
     "build": "node scripts/build.mjs",

@@ -5,7 +5,8 @@ import { dirname, join, resolve } from "node:path";
 import { resolveDataDirectory } from "../config/paths.js";
 import { readRuntimeHealth } from "./runtime-status.js";
 
-export const LAUNCHD_SERVICE_LABEL = "com.qiyuey.codex-im";
+export const LAUNCHD_SERVICE_LABEL = "com.qiyuey.agent-notify";
+export const LEGACY_LAUNCHD_SERVICE_LABEL = "com.qiyuey.codex-im";
 
 export interface LaunchdInstallOptions {
   readonly runtimeRoot: string;
@@ -25,8 +26,8 @@ export interface LaunchdServiceState {
   readonly plistPath: string;
 }
 
-export function launchdPlistPath(homeDirectory = homedir()): string {
-  return join(homeDirectory, "Library", "LaunchAgents", `${LAUNCHD_SERVICE_LABEL}.plist`);
+export function launchdPlistPath(homeDirectory = homedir(), label = LAUNCHD_SERVICE_LABEL): string {
+  return join(homeDirectory, "Library", "LaunchAgents", `${label}.plist`);
 }
 
 export function renderLaunchdPlist(options: LaunchdInstallOptions): string {
@@ -76,6 +77,8 @@ export function renderLaunchdPlist(options: LaunchdInstallOptions): string {
 export function installLaunchdService(options: LaunchdInstallOptions): LaunchdServiceState {
   requireMacOs();
   const homeDirectory = options.homeDirectory ?? homedir();
+  runLaunchctl(["bootout", serviceTarget(LEGACY_LAUNCHD_SERVICE_LABEL)], true);
+  rmSync(launchdPlistPath(homeDirectory, LEGACY_LAUNCHD_SERVICE_LABEL), { force: true });
   const previousPid = readLaunchdServiceState(homeDirectory).pid;
   const plistPath = launchdPlistPath(homeDirectory);
   mkdirSync(dirname(plistPath), { mode: 0o700, recursive: true });
@@ -127,8 +130,8 @@ export function readLaunchdServiceState(homeDirectory = homedir()): LaunchdServi
   };
 }
 
-function serviceTarget(): string {
-  return `gui/${process.getuid?.() ?? 0}/${LAUNCHD_SERVICE_LABEL}`;
+function serviceTarget(label = LAUNCHD_SERVICE_LABEL): string {
+  return `gui/${process.getuid?.() ?? 0}/${label}`;
 }
 
 function preferredNodePath(): string {

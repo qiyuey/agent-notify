@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "gateway": {
+    "agent-notify": {
       "command": "/usr/bin/env",
       "args": ["node", "./dist/mcp/server.js"],
       "cwd": "",

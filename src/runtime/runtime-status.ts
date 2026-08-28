@@ -1,7 +1,7 @@
 import { chmodSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { resolveDataDirectory } from "../config/paths.js";
-import { GATEWAY_RUNTIME_VERSION } from "../core/build-info.js";
+import { AGENT_NOTIFY_RUNTIME_VERSION } from "../core/build-info.js";
 
 export interface RuntimeHealth {
   readonly running: boolean;
@@ -51,7 +51,7 @@ export class RuntimeStatusWriter {
     const record: RuntimeStatusRecord = {
       state,
       pid: this.pid,
-      runtimeVersion: GATEWAY_RUNTIME_VERSION,
+      runtimeVersion: AGENT_NOTIFY_RUNTIME_VERSION,
       startedAt: this.startedAt,
       heartbeatAt: this.now(),
     };

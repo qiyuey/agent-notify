@@ -5,7 +5,7 @@ export interface Migration {
   readonly freshSql?: string;
 }
 
-const notificationTable = `
+const deliveryOnlyNotificationTable = `
   CREATE TABLE outbound_notifications (
     id TEXT PRIMARY KEY,
     idempotency_key TEXT NOT NULL UNIQUE,
@@ -29,11 +29,15 @@ const notificationTable = `
     ON outbound_notifications (state, lease_expires_at);
 `;
 
+const notificationTable = deliveryOnlyNotificationTable
+  .replace("id TEXT PRIMARY KEY,", "id TEXT PRIMARY KEY,\n    producer TEXT NOT NULL,")
+  .replace("telegram_message_id TEXT", "provider_message_id TEXT");
+
 export const migrations: readonly Migration[] = [
   {
     version: 10,
     name: "delivery_only",
-    freshSql: notificationTable,
+    freshSql: deliveryOnlyNotificationTable,
     sql: `
       DROP TRIGGER IF EXISTS outbound_notification_source_insert_check;
       DROP TRIGGER IF EXISTS outbound_notification_source_update_check;
@@ -41,7 +45,7 @@ export const migrations: readonly Migration[] = [
       DROP INDEX IF EXISTS outbound_notifications_lease_idx;
 
       ALTER TABLE outbound_notifications RENAME TO outbound_notifications_legacy;
-      ${notificationTable}
+      ${deliveryOnlyNotificationTable}
       INSERT INTO outbound_notifications (
         id, idempotency_key, title, message, state, attempt_count, next_attempt_at,
         lease_expires_at, lease_token, telegram_message_id, last_error, created_at, updated_at
@@ -62,6 +66,15 @@ export const migrations: readonly Migration[] = [
       DROP TABLE IF EXISTS muted_threads;
       DROP TABLE IF EXISTS telegram_status_cards;
       DELETE FROM schema_migrations;
+    `,
+  },
+  {
+    version: 11,
+    name: "agent_producers",
+    freshSql: notificationTable,
+    sql: `
+      ALTER TABLE outbound_notifications ADD COLUMN producer TEXT NOT NULL DEFAULT 'codex';
+      ALTER TABLE outbound_notifications RENAME COLUMN telegram_message_id TO provider_message_id;
     `,
   },
 ] as const;

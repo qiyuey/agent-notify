@@ -36,7 +36,9 @@ function defaultWrite(line: string, level: LogLevel): void {
 }
 
 export function createLogger(options: LoggerOptions = {}): Logger {
-  const level = options.level ?? parseLogLevel(process.env.CODEX_IM_LOG_LEVEL);
+  const level =
+    options.level ??
+    parseLogLevel(process.env.AGENT_NOTIFY_LOG_LEVEL ?? process.env.CODEX_IM_LOG_LEVEL);
   const write = options.write ?? defaultWrite;
   const threshold = LEVEL_ORDER[level];
 

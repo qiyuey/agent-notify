@@ -36,12 +36,12 @@ export class SingleInstanceLock {
         if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
         const owner = readOwner(this.path);
         if (owner !== null && isSameProcess(owner, this.identity, this.processIdentity)) {
-          throw new Error(`Codex IM daemon is already running with PID ${owner.pid}`);
+          throw new Error(`Agent Notify daemon is already running with PID ${owner.pid}`);
         }
         rmSync(this.path, { force: true });
       }
     }
-    throw new Error("Unable to acquire Codex IM daemon lock");
+    throw new Error("Unable to acquire Agent Notify daemon lock");
   }
 
   release(): void {

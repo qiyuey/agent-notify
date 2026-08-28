@@ -1,17 +1,17 @@
-# Codex IM
+# Agent Notify
 
-Codex IM 只做一件事：把用户或任务契约明确要求的消息，可靠地投递到 Telegram。
-
-## 数据流
+Agent Notify 将明确要求投递的编码 Agent 结果可靠地发送到 IM。目前支持 Codex 和 Pi
+作为生产端，Telegram 作为投递渠道。
 
 ```text
-telegram_deliver MCP 工具 → SQLite 队列 → daemon 重试循环 → Telegram
+Codex MCP ─┐
+           ├─ deliver_notification → SQLite 队列 → daemon 重试 → Telegram
+Pi 工具 ───┘
 ```
 
-项目不再接收 Telegram 消息，不连接 Codex app-server，不自动发送任务完成卡片，也没有任务
-选择、回复路由、thread watch 或 Stop Hook。
+Agent Notify 只负责通知：不接收 Telegram 消息、不管理 Agent 会话，也不自动发送任务完成卡片。
 
-## 配置
+## 运行服务
 
 要求 Node.js 26+、pnpm 11+、Telegram Bot Token 和目标 Chat ID。
 
@@ -22,16 +22,25 @@ pnpm build
 node dist/cli.js service install
 ```
 
-`.env`：
-
 ```dotenv
 TELEGRAM_BOT_TOKEN=replace-with-local-secret
 TELEGRAM_ALLOWED_CHAT_ID=123456789
-CODEX_IM_DISPATCH_INTERVAL_MS=1000
+AGENT_NOTIFY_DISPATCH_INTERVAL_MS=1000
 ```
 
-安装个人插件后，仅在用户或任务契约明确要求 Telegram 投递时使用内置
-`telegram-delivery` skill。
+daemon 独占 Telegram 网络发送；Agent 工具只负责入队，因此 Telegram 短暂故障不会阻塞工具调用。
+
+## Agent 集成
+
+Codex 插件提供 `notification-delivery` skill 和 `deliver_notification` MCP 工具。
+
+Pi 可直接从 Git 仓库安装：
+
+```bash
+pi install git:github.com/qiyuey/agent-notify
+```
+
+Pi package 注册相同的工具和 skill。两个生产端共享本地队列，并使用按生产端隔离的幂等键。
 
 ## 运维
 
@@ -44,8 +53,11 @@ node dist/cli.js recover
 node dist/cli.js service status
 ```
 
-SQLite 队列提供幂等、租约、指数退避重试和死信状态。`dedupeKey` 只标识一次逻辑投递，
+队列提供幂等、租约、指数退避重试和死信状态。`dedupeKey` 仅标识某个生产端的一次逻辑投递，
 只能在重试同一次投递时复用。
+
+为平滑迁移，程序仍会识别旧 `CODEX_IM_*` 配置和
+`~/.local/share/codex-im/gateway.sqlite` 数据库。
 
 开发校验：
 

@@ -3,7 +3,8 @@ import { z } from "zod";
 const environmentSchema = z.object({
   TELEGRAM_BOT_TOKEN: z.string().min(1),
   TELEGRAM_ALLOWED_CHAT_ID: z.coerce.number().int().positive().max(Number.MAX_SAFE_INTEGER),
-  CODEX_IM_DISPATCH_INTERVAL_MS: z.coerce.number().int().min(100).default(1_000),
+  AGENT_NOTIFY_DISPATCH_INTERVAL_MS: z.coerce.number().int().min(100).optional(),
+  CODEX_IM_DISPATCH_INTERVAL_MS: z.coerce.number().int().min(100).optional(),
 });
 
 export interface RuntimeConfig {
@@ -17,6 +18,7 @@ export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
   return {
     telegramBotToken: parsed.TELEGRAM_BOT_TOKEN,
     telegramChatId: parsed.TELEGRAM_ALLOWED_CHAT_ID,
-    dispatchIntervalMs: parsed.CODEX_IM_DISPATCH_INTERVAL_MS,
+    dispatchIntervalMs:
+      parsed.AGENT_NOTIFY_DISPATCH_INTERVAL_MS ?? parsed.CODEX_IM_DISPATCH_INTERVAL_MS ?? 1_000,
   };
 }

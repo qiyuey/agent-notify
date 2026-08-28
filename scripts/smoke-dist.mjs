@@ -1,4 +1,7 @@
 import { spawnSync } from "node:child_process";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 const env = { ...process.env };
 delete env.TELEGRAM_BOT_TOKEN;
@@ -20,4 +23,21 @@ if (result.stderr.includes("Dynamic require")) {
   throw new Error("Built daemon contains an unusable dynamic require shim");
 }
 
-process.stdout.write("Built daemon smoke test passed.\n");
+const directory = await mkdtemp(join(tmpdir(), "agent-notify-pi-smoke-"));
+try {
+  process.env.AGENT_NOTIFY_DATA_DIR = directory;
+  const tools = [];
+  const { default: registerPiExtension } = await import("../dist/pi/extension.js");
+  registerPiExtension({ registerTool: (tool) => tools.push(tool) });
+  const tool = tools[0];
+  if (tool?.name !== "deliver_notification") throw new Error("Built Pi tool was not registered");
+  const delivery = await tool.execute("smoke-call", { title: "Smoke", message: "Passed" });
+  if (!delivery.content[0]?.text.includes('"state":"queued"')) {
+    throw new Error("Built Pi tool did not enqueue a notification");
+  }
+} finally {
+  delete process.env.AGENT_NOTIFY_DATA_DIR;
+  await rm(directory, { force: true, recursive: true });
+}
+
+process.stdout.write("Built daemon and Pi extension smoke tests passed.\n");

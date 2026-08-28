@@ -10,5 +10,5 @@ history.
 - The daemon is the only network sender; enqueue calls do not contact Telegram.
 - Idempotency keys and leases limit duplicate sends during retries and restarts.
 
-Codex IM intentionally has no inbound Telegram surface and no access to Codex task sessions,
+Agent Notify intentionally has no inbound Telegram surface and no access to agent task sessions,
 workspaces, files, approvals, or conversation state.

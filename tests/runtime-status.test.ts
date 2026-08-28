@@ -18,7 +18,7 @@ afterEach(() => {
 describe("runtime status", () => {
   it("reports a live heartbeat and a clean stop", () => {
     const directory = temporaryDirectory();
-    const env = { CODEX_IM_DATA_DIR: directory };
+    const env = { AGENT_NOTIFY_DATA_DIR: directory };
     const path = resolveRuntimeStatusPath(env);
     const writer = new RuntimeStatusWriter(path, () => 1_000, process.pid);
     writer.start();
@@ -30,7 +30,7 @@ describe("runtime status", () => {
 
   it("reports missing, invalid, and stale state safely", () => {
     const directory = temporaryDirectory();
-    const env = { CODEX_IM_DATA_DIR: directory };
+    const env = { AGENT_NOTIFY_DATA_DIR: directory };
     expect(readRuntimeHealth(env)).toMatchObject({ state: "unknown", pid: null });
     writeFileSync(resolveRuntimeStatusPath(env), "{}");
     expect(readRuntimeHealth(env)).toMatchObject({ state: "unknown" });
@@ -49,7 +49,7 @@ describe("runtime status", () => {
 });
 
 function temporaryDirectory(): string {
-  const directory = mkdtempSync(join(tmpdir(), "codex-im-status-"));
+  const directory = mkdtempSync(join(tmpdir(), "agent-notify-status-"));
   directories.push(directory);
   return directory;
 }

@@ -1,6 +1,6 @@
 # Contributing
 
-Codex IM is currently in pre-alpha. Contributions that pick up items from the
+Agent Notify is currently in pre-alpha. Contributions that pick up items from the
 [roadmap](PLAN.md), improve the threat model, or add reproducible protocol and
 adapter fixtures are especially useful. `docs/architecture.md` describes how the
 shipped system works.

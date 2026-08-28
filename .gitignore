@@ -3,6 +3,7 @@
 .env.*
 !.env.example
 node_modules/
+.pnpm-store/
 dist/
 artifacts/
 coverage/
@@ -11,3 +12,4 @@ coverage/
 *.sqlite-shm
 *.sqlite-wal
 .codex-im/
+.agent-notify/

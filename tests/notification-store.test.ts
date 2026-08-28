@@ -1,26 +1,26 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { GatewayDatabase } from "../src/storage/database.js";
+import { NotificationDatabase } from "../src/storage/database.js";
 import { OutboundNotificationStore } from "../src/storage/notification-store.js";
 
-let database: GatewayDatabase;
+let database: NotificationDatabase;
 let store: OutboundNotificationStore;
 
 beforeEach(() => {
-  database = new GatewayDatabase(":memory:");
+  database = new NotificationDatabase(":memory:");
   store = new OutboundNotificationStore(database);
 });
 
 afterEach(() => database.close());
 
 describe("OutboundNotificationStore", () => {
-  it("deduplicates, leases, and records Telegram delivery", () => {
+  it("deduplicates, leases, and records provider delivery", () => {
     const first = enqueue();
     expect(enqueue().id).toBe(first.id);
     const leased = store.leaseNext({ now: 1_100, leaseDurationMs: 500 });
     if (!leased?.leaseToken) throw new Error("Expected lease");
     expect(store.markDelivered(leased.id, leased.leaseToken, "42", 1_200)).toMatchObject({
       state: "delivered",
-      telegramMessageId: "42",
+      providerMessageId: "42",
     });
   });
 
@@ -54,15 +54,20 @@ describe("OutboundNotificationStore", () => {
   });
 
   it("validates notification content", () => {
-    expect(() => store.enqueue({ idempotencyKey: "bad", title: "", message: "body" })).toThrow(
-      /title/,
-    );
+    expect(() =>
+      store.enqueue({ producer: "codex", idempotencyKey: "bad", title: "", message: "body" }),
+    ).toThrow(/title/);
   });
 });
 
 function enqueue() {
   return store.enqueue(
-    { idempotencyKey: "run:1", title: "Daily report", message: "All checks passed." },
+    {
+      producer: "codex",
+      idempotencyKey: "codex:run:1",
+      title: "Daily report",
+      message: "All checks passed.",
+    },
     1_000,
   );
 }

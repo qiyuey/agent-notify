@@ -29,8 +29,9 @@ export class NotificationDispatcher {
       this.notifications.markFailed(notification.id, notification.leaseToken, described.message, {
         now,
       });
-      this.logger.warn("telegram_delivery_failed", {
+      this.logger.warn("notification_delivery_failed", {
         notificationId: notification.id,
+        producer: notification.producer,
         kind: described.kind,
         message: described.message,
       });

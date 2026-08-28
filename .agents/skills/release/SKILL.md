@@ -1,9 +1,9 @@
 ---
 name: release
-description: "Publish Codex IM's delivery-only plugin and daemon with exact-SHA local application, migration, real Telegram delivery, and matching GitHub Actions verification. Use only when the user explicitly asks to release, publish, ship, or deploy; this workflow pushes Git history, reinstalls the plugin, restarts launchd, migrates local state, and sends one Telegram acceptance message."
+description: "Publish Agent Notify's Codex plugin, Pi package, and delivery daemon with exact-SHA local application, migration, real Telegram delivery, and matching GitHub Actions verification. Use only when the user explicitly asks to release, publish, ship, or deploy; this workflow pushes Git history, reinstalls integrations, restarts launchd, migrates local state, and sends one Telegram acceptance message."
 ---
 
-# Release Codex IM
+# Release Agent Notify
 
 Treat the pushed commit SHA and manifest version as the release identity. A release succeeds only
 when the exact plugin cache, restarted daemon, delivery-only database, real Telegram delivery, and
@@ -35,19 +35,20 @@ matching remote CI all pass.
 1. From filtered `codex plugin list --available --json` and
    `codex plugin marketplace list --json`, require exactly one local marketplace source whose
    real path is this checkout.
-2. Reinstall `codex-im@<marketplace>`. Require the installed version to equal the manifest and
+2. Reinstall `agent-notify@<marketplace>`. Require the installed version to equal the manifest and
    compare SHA-256 hashes for:
    - `.codex-plugin/plugin.json`
    - `dist/daemon.js`
    - `dist/cli.js`
    - `dist/mcp/server.js`
-   - `skills/telegram-delivery/SKILL.md`
+   - `skills/notification-delivery/SKILL.md`
+   - `dist/pi/extension.js`
 3. Require the installed cache to contain no hooks, gateway skill, or app-server/thread runtime.
-4. Verify launchd target `gui/$(id -u)/com.qiyuey.codex-im` invokes this checkout's
+4. Verify launchd target `gui/$(id -u)/com.qiyuey.agent-notify` invokes this checkout's
    `dist/daemon.js`. Capture its PID, kickstart that exact target, and require a new running PID,
    exit code 0, and `node dist/cli.js health | jq -e '.status == "ok"'`.
 5. From the health-reported database, require:
-   - migration `10:delivery_only`;
+   - migrations through `11:agent_producers`;
    - only `schema_migrations` and `outbound_notifications` tables;
    - the expected notification indexes;
    - `PRAGMA integrity_check == ok`;
@@ -56,7 +57,7 @@ matching remote CI all pass.
 ## Verify real delivery
 
 After restart, invoke the released `dist/mcp/server.js` through MCP with a unique
-`telegram_deliver` dedupe key and a concise release-acceptance message. Do not write directly to
+`deliver_notification` dedupe key and a concise release-acceptance message. Do not write directly to
 SQLite and do not use legacy completion producers. Poll the notification row until it is
 `delivered`; require a non-empty Telegram message ID and no error. This intentionally sends one
 Telegram message.

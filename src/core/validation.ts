@@ -1,6 +1,7 @@
 import type { EnqueueNotificationInput } from "./types.js";
 
 export function validateNotificationInput(input: EnqueueNotificationInput): void {
+  assertNonEmpty(input.producer, "producer", 64);
   assertNonEmpty(input.idempotencyKey, "idempotencyKey", 512);
   assertNonEmpty(input.title, "title", 200);
   assertNonEmpty(input.message, "message", 12_000);
