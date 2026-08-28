@@ -16,7 +16,7 @@ shipped system works.
 
 ## Development expectations
 
-Every change should include appropriate tests and must pass `pnpm check`, which
+Every change should include appropriate tests and must pass `npm run check`, which
 covers formatting, linting, type checking, tests with coverage thresholds, the
 bundle build, and plugin validation.
 

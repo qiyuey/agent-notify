@@ -14,12 +14,12 @@ or send automatic completion cards.
 
 ## Runtime
 
-Requires Node.js 26+, pnpm 11+, a Telegram bot token, and a target chat ID.
+Requires Node.js 26+, npm 11+, a Telegram bot token, and a target chat ID.
 
 ```bash
-pnpm install --frozen-lockfile
+npm ci
 cp .env.example .env
-pnpm build
+npm run build
 node dist/cli.js service install
 ```
 
@@ -66,5 +66,5 @@ database are discovered for migration compatibility.
 Development verification:
 
 ```bash
-pnpm check
+npm run check
 ```

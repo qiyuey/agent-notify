@@ -23,8 +23,8 @@ matching remote CI all pass.
 ## Build the release
 
 1. Run `node .agents/skills/release/scripts/update-cachebuster.mjs .`.
-2. Match the Node and pnpm versions declared in `.github/workflows/ci.yml`.
-3. Run `pnpm install --frozen-lockfile && pnpm check`.
+2. Match the Node and npm versions declared in `.github/workflows/ci.yml`.
+3. Run `npm ci && npm run check`.
 4. Require clean `git diff --check`, review the complete staged patch, and create one Conventional
    Commit without bypassing hooks.
 5. Push the current branch normally, or with `--force-with-lease` only under the explicit

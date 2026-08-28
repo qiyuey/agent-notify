@@ -13,12 +13,12 @@ Agent Notify 只负责通知：不接收 Telegram 消息、不管理 Agent 会�
 
 ## 运行服务
 
-要求 Node.js 26+、pnpm 11+、Telegram Bot Token 和目标 Chat ID。
+要求 Node.js 26+、npm 11+、Telegram Bot Token 和目标 Chat ID。
 
 ```bash
-pnpm install --frozen-lockfile
+npm ci
 cp .env.example .env
-pnpm build
+npm run build
 node dist/cli.js service install
 ```
 
@@ -62,5 +62,5 @@ node dist/cli.js service status
 开发校验：
 
 ```bash
-pnpm check
+npm run check
 ```
