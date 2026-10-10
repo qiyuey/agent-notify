@@ -14,7 +14,8 @@ or send automatic completion cards.
 
 ## Runtime
 
-Requires Node.js 26+, npm 11+, a Telegram bot token, and a target chat ID.
+Requires Node.js 26+, npm 12+, a Telegram bot token, and a target chat ID.
+Use the npm version pinned in `package.json` (`packageManager`) to match CI.
 
 ```bash
 npm ci

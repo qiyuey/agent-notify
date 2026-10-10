@@ -17,5 +17,8 @@ jobs:
         with:
           node-version: 26
           cache: npm
+      - name: Use the project npm version
+        run: npm install --global "$(node -p 'require("./package.json").packageManager')"
       - run: npm ci
+      - run: npm audit
       - run: npm run check

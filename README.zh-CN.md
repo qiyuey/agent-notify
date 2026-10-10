@@ -13,7 +13,8 @@ Agent Notify 只负责通知：不接收 Telegram 消息、不管理 Agent 会�
 
 ## 运行服务
 
-要求 Node.js 26+、npm 11+、Telegram Bot Token 和目标 Chat ID。
+要求 Node.js 26+、npm 12+、Telegram Bot Token 和目标 Chat ID。
+使用 `package.json` 的 `packageManager` 字段固定的 npm 版本，与 CI 保持一致。
 
 ```bash
 npm ci
