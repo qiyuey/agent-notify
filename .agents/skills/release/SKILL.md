@@ -23,7 +23,8 @@ matching remote CI all pass.
 ## Build the release
 
 1. Run `node .agents/skills/release/scripts/update-cachebuster.mjs .`.
-2. Match the Node and npm versions declared in `.github/workflows/ci.yml`.
+2. Use the Node version declared in `.github/workflows/ci.yml` and the npm version in
+   `package.json`'s `packageManager` field.
 3. Run `npm ci && npm run check`.
 4. Require clean `git diff --check`, review the complete staged patch, and create one Conventional
    Commit without bypassing hooks.
@@ -33,16 +34,18 @@ matching remote CI all pass.
 ## Apply the exact local build
 
 1. From filtered `codex plugin list --available --json` and
-   `codex plugin marketplace list --json`, require exactly one local marketplace source whose
-   real path is this checkout.
-2. Reinstall `agent-notify@<marketplace>`. Require the installed version to equal the manifest and
-   compare SHA-256 hashes for:
-   - `.codex-plugin/plugin.json`
-   - `dist/daemon.js`
-   - `dist/cli.js`
-   - `dist/mcp/server.js`
-   - `skills/notification-delivery/SKILL.md`
-   - `dist/pi/extension.js`
+   `codex plugin marketplace list --json`, resolve the intended local plugin source. It must point
+   to this checkout or its `artifacts/agent-notify` package; a marketplace catalog may live elsewhere.
+2. Use the installed CLI's `codex plugin --help` and `codex plugin add --help` to refresh
+   `agent-notify@<marketplace>`. Verify the installed copy rather than assuming an existing install
+   was refreshed. Compare the cached manifest version and SHA-256 hashes against
+   `artifacts/agent-notify` for `.codex-plugin/plugin.json`, `.mcp.json`, `dist/mcp/server.js`, and
+   `skills/notification-delivery/SKILL.md`.
+   Verify the daemon and CLI separately against `artifacts/runtime/dist`, and the installed Pi
+   extension against `artifacts/pi-package/extensions/agent-notify.js`. Refresh the Pi installation
+   from the exact built package using the installed Pi CLI's supported installation command, then
+   verify its extension and skill hashes. These runtime and Pi files are not part of the standalone
+   Codex plugin package.
 3. Require the installed cache to contain no hooks, gateway skill, or app-server/thread runtime.
 4. Verify launchd target `gui/$(id -u)/com.qiyuey.agent-notify` invokes this checkout's
    `dist/daemon.js`. Capture its PID, kickstart that exact target, and require a new running PID,
@@ -56,7 +59,7 @@ matching remote CI all pass.
 
 ## Verify real delivery
 
-After restart, invoke the released `dist/mcp/server.js` through MCP with a unique
+After restart, invoke the installed Codex plugin's `dist/mcp/server.js` through MCP with a unique
 `deliver_notification` dedupe key and a concise release-acceptance message. Do not write directly to
 SQLite and do not use legacy completion producers. Poll the notification row until it is
 `delivered`; require a non-empty Telegram message ID and no error. This intentionally sends one

@@ -33,6 +33,9 @@ daemon 独占 Telegram 网络发送；Agent 工具只负责入队，因此 Teleg
 ## Agent 集成
 
 Codex 插件提供 `notification-delivery` skill 和 `deliver_notification` MCP 工具。
+运行 `npm run build` 后，将本地 Codex marketplace 条目的来源指向相对于仓库根目录的
+`./artifacts/agent-notify`，安装该条目并开启新对话。插件要求 `PATH` 中有 Node.js；
+投递 daemon 需按上面的运行服务步骤单独安装和启动。
 
 Pi 可直接从 Git 仓库安装：
 
@@ -64,3 +67,6 @@ node dist/cli.js service status
 ```bash
 npm run check
 ```
+
+该命令包含对独立打包的 Codex 插件进行的真实 MCP 协议测试，使用临时数据库，不发送 Telegram
+消息。构建后可用 `npm run test:mcp` 单独重跑，覆盖握手、工具发现、持久化去重和错误恢复。

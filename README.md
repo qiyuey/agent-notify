@@ -35,6 +35,10 @@ Telegram failures do not block the agent tool call.
 ## Agent integrations
 
 The Codex plugin exposes the `notification-delivery` skill and `deliver_notification` MCP tool.
+After `npm run build`, point your local Codex marketplace entry at
+`./artifacts/agent-notify` relative to this repository's marketplace root. Install that entry in
+Codex and start a new chat to load it. The plugin requires Node.js on `PATH`; install and start the
+delivery daemon separately using the Runtime steps above.
 
 Pi can install the repository directly:
 
@@ -68,3 +72,7 @@ Development verification:
 ```bash
 npm run check
 ```
+
+This includes real MCP protocol tests against a relocated copy of the built Codex plugin, using
+temporary databases and no Telegram delivery. To rerun just those tests after building, use
+`npm run test:mcp`.

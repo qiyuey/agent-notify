@@ -2,8 +2,10 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { enqueueNotification } from "../application/enqueue-notification.js";
+import { AGENT_NOTIFY_RUNTIME_VERSION } from "../core/build-info.js";
+import { notificationStates } from "../core/types.js";
 
-const server = new McpServer({ name: "agent-notify", version: "0.1.0" });
+const server = new McpServer({ name: "agent-notify", version: AGENT_NOTIFY_RUNTIME_VERSION });
 
 server.registerTool(
   "deliver_notification",
@@ -24,7 +26,7 @@ server.registerTool(
     }),
     outputSchema: z.object({
       notificationId: z.string(),
-      state: z.string(),
+      state: z.enum(notificationStates),
       duplicate: z.boolean(),
     }),
   },
