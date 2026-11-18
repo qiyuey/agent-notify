@@ -3,7 +3,8 @@ import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 
 export function resolveDataDirectory(env: NodeJS.ProcessEnv = process.env): string {
-  const configured = env.AGENT_NOTIFY_DATA_DIR ?? env.CODEX_IM_DATA_DIR ?? env.PLUGIN_DATA;
+  // Codex assigns PLUGIN_DATA to its own directory, separate from the daemon's queue.
+  const configured = env.AGENT_NOTIFY_DATA_DIR ?? env.CODEX_IM_DATA_DIR;
   if (configured && configured.trim().length > 0) {
     return resolve(configured);
   }

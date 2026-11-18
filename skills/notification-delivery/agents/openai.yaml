@@ -1,0 +1,6 @@
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "agent-notify"
+      description: "Queue a result for Telegram delivery"
+      transport: "stdio"

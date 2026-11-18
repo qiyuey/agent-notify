@@ -1,12 +1,9 @@
 # Agent Notify
 
-Agent Notify 将明确要求投递的编码 Agent 结果可靠地发送到 IM。目前支持 Codex 和 Pi
-作为生产端，Telegram 作为投递渠道。
+Agent Notify 将明确要求投递的 Codex 任务结果可靠地发送到 Telegram。
 
 ```text
-Codex MCP ─┐
-           ├─ deliver_notification → SQLite 队列 → daemon 重试 → Telegram
-Pi 工具 ───┘
+Codex MCP → deliver_notification → SQLite 队列 → daemon 重试 → Telegram
 ```
 
 Agent Notify 只负责通知：不接收 Telegram 消息、不管理 Agent 会话，也不自动发送任务完成卡片。
@@ -35,16 +32,11 @@ daemon 独占 Telegram 网络发送；Agent 工具只负责入队，因此 Teleg
 
 Codex 插件提供 `notification-delivery` skill 和 `deliver_notification` MCP 工具。
 运行 `npm run build` 后，将本地 Codex marketplace 条目的来源指向相对于仓库根目录的
-`./artifacts/agent-notify`，安装该条目并开启新对话。插件要求 `PATH` 中有 Node.js；
-投递 daemon 需按上面的运行服务步骤单独安装和启动。
-
-Pi 可直接从 Git 仓库安装：
-
-```bash
-pi install git:github.com/qiyuey/agent-notify
-```
-
-Pi package 注册相同的工具和 skill。两个生产端共享本地队列，并使用按生产端隔离的幂等键。
+`./artifacts/agent-notify`，安装该条目并开启新对话。插件使用 Agent Plugins 1.0 的
+`plugin.json` 和 `mcp.json` 格式，通过 stdio 在桌面端本地线程或 Codex CLI 会话中启动 MCP
+服务。ChatGPT 网页、移动端和云端线程无法运行该本地服务。公开发布含本地 MCP 服务的
+[桌面插件](https://developers.openai.com/plugins/deploy/desktop-only)需要 OpenAI 合作伙伴审批。
+本机的 `PATH` 需包含 Node.js。投递 daemon 需按上面的运行服务步骤单独安装和启动。
 
 ## 运维
 

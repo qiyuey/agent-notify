@@ -1,16 +1,13 @@
 # Architecture
 
-Agent Notify has multiple local producers, one durable queue, and one network consumer.
+Codex writes to a local durable queue, and the delivery daemon sends notifications to Telegram.
 
 ```text
-Codex MCP ─┐
-           ├── EnqueueNotification ── outbound_notifications (SQLite)
-Pi tool ───┘                              └── DeliveryApplication
-                                                   └── Telegram Bot API
+Codex MCP → outbound_notifications (SQLite) → delivery daemon → Telegram Bot API
 ```
 
-Both integrations expose `deliver_notification(title, message, dedupeKey?)`. They assign their own
-trusted producer identity; the model cannot select a destination or provide transport credentials.
+The MCP server exposes `deliver_notification(title, message, dedupeKey?)` and sets `codex` as the
+producer. Destination and credentials come from the daemon configuration.
 
 The producer process only enqueues. The daemon is the sole network sender. It leases queued rows,
 sends Rich Markdown, records the provider message ID, and retries failures with bounded exponential

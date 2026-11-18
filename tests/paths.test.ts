@@ -13,4 +13,10 @@ describe("runtime paths", () => {
       "/tmp/codex-im-test",
     );
   });
+
+  it("shares the daemon queue when the plugin host sets its own data directory", () => {
+    expect(resolveDatabasePath({ PLUGIN_DATA: "/tmp/codex-plugin-data" })).toBe(
+      resolveDatabasePath({}),
+    );
+  });
 });

@@ -26,6 +26,20 @@ describe("NotificationDispatcher", () => {
     expect(store.list("delivered")[0]?.providerMessageId).toBe("message-1");
   });
 
+  it("delivers a queued notification from the retired Pi integration", async () => {
+    const legacy = store.enqueue(
+      { producer: "pi", idempotencyKey: "pi:run:1", title: "Legacy report", message: "Done." },
+      900,
+    );
+    const sender = { send: vi.fn(async () => ({ messageId: "legacy-message" })) };
+    const dispatcher = new NotificationDispatcher(store, sender);
+
+    expect(await dispatcher.runOnce(1_100)).toBe(true);
+    expect(store.list("delivered")).toMatchObject([
+      { id: legacy.id, producer: "pi", providerMessageId: "legacy-message" },
+    ]);
+  });
+
   it("keeps a failed send retryable", async () => {
     const dispatcher = new NotificationDispatcher(store, {
       send: vi.fn(async () => {

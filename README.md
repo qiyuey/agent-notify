@@ -1,12 +1,9 @@
 # Agent Notify
 
-Agent Notify durably delivers explicitly requested coding-agent results to IM. It currently
-supports Codex and Pi as producers and Telegram as the delivery channel.
+Agent Notify durably delivers explicitly requested Codex results to Telegram.
 
 ```text
-Codex MCP ─┐
-           ├─ deliver_notification → SQLite queue → daemon retries → Telegram
-Pi tool ───┘
+Codex MCP → deliver_notification → SQLite queue → daemon retries → Telegram
 ```
 
 Agent Notify is notification-only. It does not receive Telegram messages, manage agent sessions,
@@ -38,17 +35,12 @@ Telegram failures do not block the agent tool call.
 The Codex plugin exposes the `notification-delivery` skill and `deliver_notification` MCP tool.
 After `npm run build`, point your local Codex marketplace entry at
 `./artifacts/agent-notify` relative to this repository's marketplace root. Install that entry in
-Codex and start a new chat to load it. The plugin requires Node.js on `PATH`; install and start the
-delivery daemon separately using the Runtime steps above.
-
-Pi can install the repository directly:
-
-```bash
-pi install git:github.com/qiyuey/agent-notify
-```
-
-The Pi package registers the same tool and skill. Both integrations use producer-scoped
-idempotency keys and the same local queue.
+Codex and start a new chat to load it. The package uses the Agent Plugins 1.0 `plugin.json` and
+`mcp.json` format. It runs its stdio MCP server in local desktop threads and Codex CLI sessions.
+ChatGPT web, mobile, and cloud threads cannot run the local server. Public distribution of
+[desktop-only plugins with local MCP servers](https://developers.openai.com/plugins/deploy/desktop-only)
+requires OpenAI partner approval. The host needs Node.js on `PATH`. Install and start the delivery
+daemon separately using the Runtime steps above.
 
 ## Operations
 

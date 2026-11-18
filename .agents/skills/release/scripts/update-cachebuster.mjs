@@ -27,7 +27,7 @@ export function utcCachebuster(now = new Date()) {
 }
 
 export async function updateCachebuster(pluginRoot, cachebuster = utcCachebuster()) {
-  const manifestPath = resolve(pluginRoot, ".codex-plugin", "plugin.json");
+  const manifestPath = resolve(pluginRoot, "plugin.json");
   const source = await readFile(manifestPath, "utf8");
   const manifest = JSON.parse(source);
   const previousVersion = manifest.version;

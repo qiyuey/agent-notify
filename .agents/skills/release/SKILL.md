@@ -1,6 +1,6 @@
 ---
 name: release
-description: "Publish Agent Notify's Codex plugin, Pi package, and delivery daemon with exact-SHA local application, migration, real Telegram delivery, and matching GitHub Actions verification. Use only when the user explicitly asks to release, publish, ship, or deploy; this workflow pushes Git history, reinstalls integrations, restarts launchd, migrates local state, and sends one Telegram acceptance message."
+description: "Publish Agent Notify's Codex plugin and delivery daemon with exact-SHA local application, migration, real Telegram delivery, and matching GitHub Actions verification. Use only when the user explicitly asks to release, publish, ship, or deploy; this workflow pushes Git history, reinstalls integrations, restarts launchd, migrates local state, and sends one Telegram acceptance message."
 ---
 
 # Release Agent Notify
@@ -39,13 +39,9 @@ matching remote CI all pass.
 2. Use the installed CLI's `codex plugin --help` and `codex plugin add --help` to refresh
    `agent-notify@<marketplace>`. Verify the installed copy rather than assuming an existing install
    was refreshed. Compare the cached manifest version and SHA-256 hashes against
-   `artifacts/agent-notify` for `.codex-plugin/plugin.json`, `.mcp.json`, `dist/mcp/server.js`, and
+   `artifacts/agent-notify` for `plugin.json`, `mcp.json`, `dist/mcp/server.js`, and
    `skills/notification-delivery/SKILL.md`.
-   Verify the daemon and CLI separately against `artifacts/runtime/dist`, and the installed Pi
-   extension against `artifacts/pi-package/extensions/agent-notify.js`. Refresh the Pi installation
-   from the exact built package using the installed Pi CLI's supported installation command, then
-   verify its extension and skill hashes. These runtime and Pi files are not part of the standalone
-   Codex plugin package.
+   Verify the daemon and CLI separately against `artifacts/runtime/dist`.
 3. Require the installed cache to contain no hooks, gateway skill, or app-server/thread runtime.
 4. Verify launchd target `gui/$(id -u)/com.qiyuey.agent-notify` invokes this checkout's
    `dist/daemon.js`. Capture its PID, kickstart that exact target, and require a new running PID,

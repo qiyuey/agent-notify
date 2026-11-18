@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
@@ -12,16 +12,15 @@ const scriptPath = fileURLToPath(
 
 async function makePlugin(version: string) {
   const root = await mkdtemp(`${tmpdir()}/agent-notify-release-`);
-  await mkdir(`${root}/.codex-plugin`);
   await writeFile(
-    `${root}/.codex-plugin/plugin.json`,
+    `${root}/plugin.json`,
     `{\n  "name": "agent-notify",\n  "version": ${JSON.stringify(version)},\n  "keywords": ["agent", "telegram"]\n}\n`,
   );
   return root;
 }
 
 async function readVersion(root: string) {
-  const manifest = JSON.parse(await readFile(`${root}/.codex-plugin/plugin.json`, "utf8"));
+  const manifest = JSON.parse(await readFile(`${root}/plugin.json`, "utf8"));
   return manifest.version as string;
 }
 
@@ -38,7 +37,7 @@ describe("release cachebuster", () => {
 
     expect(stdout).toBe("0.1.0+codex.old-token -> 0.1.0+codex.20260715010203\n");
     expect(await readVersion(root)).toBe("0.1.0+codex.20260715010203");
-    expect(await readFile(`${root}/.codex-plugin/plugin.json`, "utf8")).toContain(
+    expect(await readFile(`${root}/plugin.json`, "utf8")).toContain(
       '"keywords": ["agent", "telegram"]',
     );
   });

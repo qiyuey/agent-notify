@@ -14,10 +14,10 @@ export interface EnqueueNotificationResult {
 }
 
 export function enqueueNotification(
-  producer: string,
   input: DeliverNotificationInput,
   env: NodeJS.ProcessEnv = process.env,
 ): EnqueueNotificationResult {
+  const producer = "codex";
   const context = openNotificationStore(env);
   try {
     const idempotencyKey = `${producer}:${input.dedupeKey ?? randomUUID()}`;

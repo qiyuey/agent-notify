@@ -4,8 +4,8 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { test } from "node:test";
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { Client } from "@modelcontextprotocol/client";
+import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 
 const packageRoot = resolve("artifacts/agent-notify");
 const runtime = JSON.parse(await readFile("package.json", "utf8"));
@@ -26,25 +26,23 @@ async function fixture(t) {
   const pluginRoot = join(root, "plugin with spaces");
   const dataRoot = join(root, "data");
   await cp(packageRoot, pluginRoot, { recursive: true });
-  const config = JSON.parse(await readFile(join(pluginRoot, ".mcp.json"), "utf8"));
+  const config = JSON.parse(await readFile(join(pluginRoot, "mcp.json"), "utf8"));
   const server = config.mcpServers["agent-notify"];
 
-  async function connect() {
-    const env = Object.fromEntries(
-      (server.env_vars ?? [])
-        .filter((name) => process.env[name] !== undefined)
-        .map((name) => [name, process.env[name]]),
-    );
-    env.AGENT_NOTIFY_DATA_DIR = dataRoot;
+  async function connect(mode = "legacy") {
+    const expand = (value) => value.replaceAll(`\${PLUGIN_ROOT}`, () => pluginRoot);
     const transport = new StdioClientTransport({
       command: server.command,
-      args: server.args,
-      cwd: resolve(pluginRoot, server.cwd ?? "."),
-      env,
+      args: server.args.map(expand),
+      cwd: expand(server.cwd),
+      env: { AGENT_NOTIFY_DATA_DIR: dataRoot },
       stderr: "pipe",
     });
     transport.stderr?.on("data", () => {});
-    const client = new Client({ name: "agent-notify-integration", version: "1.0.0" });
+    const client = new Client(
+      { name: "agent-notify-integration", version: "1.0.0" },
+      { versionNegotiation: { mode } },
+    );
     clients.push(client);
     await client.connect(transport, requestOptions);
     return client;
@@ -63,16 +61,13 @@ async function fixture(t) {
 }
 
 function call(client, args) {
-  return client.callTool(
-    { name: "deliver_notification", arguments: args },
-    undefined,
-    requestOptions,
-  );
+  return client.callTool({ name: "deliver_notification", arguments: args }, requestOptions);
 }
 
 test("packaged MCP initializes and exposes the notification contract", async (t) => {
   const { connect } = await fixture(t);
   const client = await connect();
+  assert.equal(client.getProtocolEra(), "legacy");
   assert.deepEqual(client.getServerVersion(), { name: "agent-notify", version: runtime.version });
   const { tools } = await client.listTools({}, requestOptions);
   assert.deepEqual(
@@ -88,6 +83,17 @@ test("packaged MCP initializes and exposes the notification contract", async (t)
   ]);
   assert.equal(tools[0].annotations.readOnlyHint, false);
   assert.equal(tools[0].annotations.idempotentHint, false);
+  assert.equal(tools[0].annotations.destructiveHint, false);
+  assert.equal(tools[0].annotations.openWorldHint, true);
+});
+
+test("packaged MCP accepts the 2026-07-28 protocol", async (t) => {
+  const { connect, rows } = await fixture(t);
+  const client = await connect({ pin: "2026-07-28" });
+  assert.equal(client.getNegotiatedProtocolVersion(), "2026-07-28");
+  const result = await call(client, payload);
+  assert.equal(result.structuredContent.state, "queued");
+  assert.equal(rows().length, 1);
 });
 
 test("MCP enqueue persists and deduplicates across server restarts", async (t) => {

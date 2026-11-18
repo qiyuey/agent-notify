@@ -12,13 +12,27 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version: 26
           cache: npm
       - name: Use the project npm version
         run: npm install --global "$(node -p 'require("./package.json").packageManager')"
       - run: npm ci
-      - run: npm audit
+      - name: Audit production dependencies
+        run: npm audit --omit=dev
+      - name: Audit all dependencies
+        run: |
+          report="$RUNNER_TEMP/agent-notify-npm-audit.json"
+          if npm audit --json > "$report"; then
+            exit 0
+          fi
+          cat "$report"
+          # picomatch has no patched release for GHSA-fc5q-39xc-vjpf yet.
+          jq -e '
+            (.error == null) and
+            ([.vulnerabilities[].via[] | objects | .url]
+              | length > 0 and all(. == "https://github.com/advisories/GHSA-fc5q-39xc-vjpf"))
+          ' "$report" > /dev/null
       - run: npm run check

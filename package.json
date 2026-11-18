@@ -10,7 +10,7 @@
   },
   "type": "module",
   "private": true,
-  "packageManager": "npm@12.2.0",
+  "packageManager": "npm@12.2.3",
   "engines": {
     "node": ">=26.0.0",
     "npm": ">=12.0.0"
@@ -26,19 +26,9 @@
   "keywords": [
     "agent",
     "codex",
-    "pi",
     "telegram",
-    "notifications",
-    "pi-package"
+    "notifications"
   ],
-  "pi": {
-    "extensions": [
-      "./src/pi/extension.ts"
-    ],
-    "skills": [
-      "./skills"
-    ]
-  },
   "scripts": {
     "build": "node scripts/build.mjs",
     "check": "npm run format:check && npm run typecheck && npm run test:coverage && npm run build && npm run smoke:dist && npm run validate:plugin && npm run test:mcp",
@@ -54,17 +44,18 @@
     "validate:plugin": "node scripts/validate-plugin.mjs"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.32.1",
+    "@modelcontextprotocol/server": "2.4.0",
     "grammy": "^1.46.0",
-    "zod": "4.6.5"
+    "zod": "4.6.7"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.15",
-    "@types/node": "26.6.5",
+    "@biomejs/biome": "2.6.8",
+    "@types/node": "26.6.6",
     "@types/node-fetch": "2.6.13",
-    "@vitest/coverage-v8": "5.0.3",
+    "@vitest/coverage-v8": "5.1.1",
     "esbuild": "0.28.2",
     "typescript": "7.0.2",
-    "vitest": "5.0.3"
+    "vitest": "5.1.1",
+    "@modelcontextprotocol/client": "2.4.0"
   }
 }

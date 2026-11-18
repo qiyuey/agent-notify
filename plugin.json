@@ -1,0 +1,26 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "agent-notify",
+  "version": "0.1.0+codex.20261118092836",
+  "description": "Durably deliver explicit agent results to Telegram.",
+  "author": {
+    "name": "Agent Notify contributors"
+  },
+  "homepage": "https://github.com/qiyuey/agent-notify",
+  "repository": "https://github.com/qiyuey/agent-notify",
+  "license": "MIT",
+  "keywords": ["agent", "codex", "telegram", "notifications"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Agent Notify",
+        "shortDescription": "Send explicit agent results to Telegram.",
+        "longDescription": "A local-first durable queue for explicitly requested agent notifications.",
+        "developerName": "Agent Notify contributors",
+        "category": "Productivity",
+        "capabilities": ["Notifications", "Local-first"],
+        "defaultPrompt": ["Deliver this completed result as a notification."]
+      }
+    }
+  }
+}
